@@ -188,7 +188,10 @@
         /* The list item will be inserted in wake time order. */
         listSET_LIST_ITEM_VALUE( &( pxCurrentCoRoutine->xGenericListItem ), xTimeToWake );
 
-        if( xTimeToWake < xCoRoutineTickCount )
+        /*if( xTimeToWake < xCoRoutineTickCount )
+            Corrected to handle tick overflow
+        */
+        if (xTimeToWake - xCoRoutineTickCount >= 2147483647)
         {
             /* Wake time has overflowed.  Place this item in the
              * overflow list. */
@@ -263,7 +266,10 @@
             {
                 pxCRCB = ( CRCB_t * ) listGET_OWNER_OF_HEAD_ENTRY( pxDelayedCoRoutineList );
 
-                if( xCoRoutineTickCount < listGET_LIST_ITEM_VALUE( &( pxCRCB->xGenericListItem ) ) )
+                /*if( xCoRoutineTickCount < listGET_LIST_ITEM_VALUE( &( pxCRCB->xGenericListItem ) ) )
+                    Corrected to handle tick overflow
+                */
+                if( xCoRoutineTickCount - listGET_LIST_ITEM_VALUE( &( pxCRCB->xGenericListItem ) ) >= 2147483647 )
                 {
                     /* Timeout not yet expired. */
                     break;
